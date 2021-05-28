@@ -1,4 +1,5 @@
-package domain ///TODO: прочитать про DAO
+package domain
+
 import (
 	"fmt"
 	"github.com/Nicrii/Advertisement/datasources/postgresql/ads_db"
@@ -8,10 +9,11 @@ import (
 )
 
 const (
-	queryGetAd = "SELECT id,name,description,images_urls,price, date FROM advertisement WHERE id=$1;"
+	queryGetAd    = "SELECT id,name,description,images_urls,price, date FROM advertisement WHERE id=$1;"
+	queryInsertAd = "INSERT INTO advertisement(name, description,images_urls, price,date) VALUES($1, $2, $3,$4,now()) RETURNING id;"
 )
 
-func GetAd(id int64, fields []string) (*GetResponse, *utils.ApplicationError) {
+func Get(id int64, fields []string) (*GetResponse, *utils.ApplicationError) {
 	var ad Ad
 	var result GetResponse
 	stmt, err := ads_db.Client.Prepare(queryGetAd)
@@ -22,7 +24,7 @@ func GetAd(id int64, fields []string) (*GetResponse, *utils.ApplicationError) {
 
 	query := stmt.QueryRow(id)
 	if err := query.Scan(&ad.Id, &ad.Name, &ad.Description, pq.Array(&ad.ImagesURLs), &ad.Price, &ad.Date); err != nil {
-		return nil, &utils.ApplicationError{Message: fmt.Sprintf("error when trying to get ad %d %s", ad.Id, err.Error()), StatusCode: http.StatusInternalServerError, Code: "server_error"}
+		return nil, &utils.ApplicationError{Message: fmt.Sprintf("error when trying to get ad %d %s", id, err.Error()), StatusCode: http.StatusNotFound, Code: "not_found"}
 	}
 	result.Name = ad.Name
 	result.Price = ad.Price
@@ -41,4 +43,22 @@ func GetAd(id int64, fields []string) (*GetResponse, *utils.ApplicationError) {
 	}
 
 	return &result, nil
+}
+
+func (ad *Ad) Save() (int64, int) {
+	var id int64
+	stmt, err := ads_db.Client.Prepare(queryInsertAd)
+	if err != nil {
+		return 0, http.StatusInternalServerError
+	}
+	defer stmt.Close()
+
+	insertResult := stmt.QueryRow(ad.Name, ad.Description, pq.Array(ad.ImagesURLs), ad.Price)
+	err = insertResult.Scan(&id)
+	if err != nil {
+		fmt.Println(err)
+		return 0, http.StatusInternalServerError
+	}
+
+	return id, http.StatusOK
 }

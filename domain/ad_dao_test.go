@@ -1,7 +1,7 @@
 package domain
 
 //func TestGetAdNoAdFound(t *testing.T) {
-//	ad, err := AdDao.GetAd(0)
+//	ad, err := AdDao.Get(0)
 //	assert.Nil(t, ad, "we were not expecting a ad with id = 0")
 //	assert.NotNil(t, err, "we were not expecting an error when ad id is 0")
 //	assert.EqualValues(t, err.StatusCode, http.StatusNotFound)
@@ -10,7 +10,7 @@ package domain
 //}
 //
 //func TestGetAdNoError(t *testing.T) {
-//	ad, err := AdDao.GetAd(123)
+//	ad, err := AdDao.Get(123)
 //	assert.Nil(t, err)
 //	assert.NotNil(t, ad)
 //	assert.EqualValues(t, ad.Id, uint64(123))

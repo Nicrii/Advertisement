@@ -17,7 +17,7 @@ package services
 //
 //type adsDaoMock struct{}
 //
-//func (m *adsDaoMock) GetAd(adId int64) (*domain.Ad, *utils.ApplicationError) {
+//func (m *adsDaoMock) Get(adId int64) (*domain.Ad, *utils.ApplicationError) {
 //	return getAdFunction(adId)
 //}
 //
@@ -32,7 +32,7 @@ package services
 //			Message:    "ad 0 not found",
 //		}
 //	}
-//	ad, err := AdsService.GetAd(0)
+//	ad, err := AdsService.Get(0)
 //	assert.Nil(t, ad)
 //	assert.NotNil(t, err)
 //	assert.EqualValues(t, err.StatusCode, http.StatusNotFound)
@@ -50,7 +50,7 @@ package services
 //			Date:        date.Date{Year: 2021},
 //		}, nil
 //	}
-//	ad, err := AdsService.GetAd(0)
+//	ad, err := AdsService.Get(0)
 //	assert.Nil(t, err)
 //	assert.NotNil(t, ad)
 //	assert.EqualValues(t, ad.Id, uint64(123))

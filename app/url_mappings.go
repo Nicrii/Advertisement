@@ -5,5 +5,7 @@ import (
 )
 
 func mapUrls() {
-	router.GET("/GetAd/:ad_id", controllers.GetAd)
+	router.GET("/ad/:ad_id", controllers.Get)
+	router.POST("/ad", controllers.Create)
+	//router.GET("/ads",controllers.Create)
 }
