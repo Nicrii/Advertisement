@@ -8,20 +8,37 @@ import (
 )
 
 const (
-	queryGetAd = "SELECT * FROM advertisement WHERE id=$1;"
+	queryGetAd = "SELECT id,name,description,images_urls,price, date FROM advertisement WHERE id=$1;"
 )
 
-func (ad *Ad) GetAd() *utils.ApplicationError {
+func GetAd(id int64, fields []string) (*GetResponse, *utils.ApplicationError) {
+	var ad Ad
+	var result GetResponse
 	stmt, err := ads_db.Client.Prepare(queryGetAd)
 	if err != nil {
-		return &utils.ApplicationError{Message: err.Error(), StatusCode: http.StatusInternalServerError, Code: "server_error"}
+		return nil, &utils.ApplicationError{Message: err.Error(), StatusCode: http.StatusInternalServerError, Code: "server_error"}
 	}
 	defer stmt.Close()
 
-	result := stmt.QueryRow(ad.Id)
-	if err := result.Scan(&ad.Id, &ad.Name, &ad.Description, pq.Array(&ad.ImagesURLs), &ad.Price, &ad.Date); err != nil {
-		return &utils.ApplicationError{Message: fmt.Sprintf("error when trying to get ad %d %s", ad.Id, err.Error()), StatusCode: http.StatusInternalServerError, Code: "server_error"}
+	query := stmt.QueryRow(id)
+	if err := query.Scan(&ad.Id, &ad.Name, &ad.Description, pq.Array(&ad.ImagesURLs), &ad.Price, &ad.Date); err != nil {
+		return nil, &utils.ApplicationError{Message: fmt.Sprintf("error when trying to get ad %d %s", ad.Id, err.Error()), StatusCode: http.StatusInternalServerError, Code: "server_error"}
+	}
+	result.Name = ad.Name
+	result.Price = ad.Price
+	if len(ad.ImagesURLs[0]) > 0 {
+		result.MainImage = ad.ImagesURLs[0]
+	} else {
+		result.MainImage = ""
+	}
+	for _, field := range fields {
+		switch field {
+		case "description":
+			result.Description = ad.Description
+		case "images_urls":
+			result.ImagesURLs = ad.ImagesURLs
+		}
 	}
 
-	return nil
+	return &result, nil
 }

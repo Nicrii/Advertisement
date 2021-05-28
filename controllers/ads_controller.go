@@ -8,16 +8,7 @@ import (
 	"strconv"
 )
 
-type ResultGet struct {
-	Name        string   `json:"name"`
-	Price       int      `json:"price"`
-	MainImage   string   `json:"main_image"`
-	Description string   `json:"description,omitempty"`
-	ImagesURLs  []string `json:"images_urls,omitempty"`
-}
-
 func GetAd(c *gin.Context) {
-	var result ResultGet
 	adId, err := strconv.ParseInt(c.Param("ad_id"), 10, 64)
 
 	if err != nil {
@@ -27,23 +18,11 @@ func GetAd(c *gin.Context) {
 	}
 	fields := c.QueryArray("fields[]")
 
-	ad, apiErr := services.AdsService.GetAd(adId)
+	ad, apiErr := services.AdsService.GetAd(adId, fields)
 	if apiErr != nil {
 		c.JSON(apiErr.StatusCode, apiErr)
 		return
 	}
-	result.Name = ad.Name
-	result.Price = ad.Price
-	result.MainImage = ad.ImagesURLs[0]
 
-	for _, field := range fields {
-		switch field {
-		case "description":
-			result.Description = ad.Description
-		case "images_urls":
-			result.ImagesURLs = ad.ImagesURLs
-		}
-	}
-
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, ad)
 }
