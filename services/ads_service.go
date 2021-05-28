@@ -13,11 +13,9 @@ var (
 )
 
 func (a *adsService) GetAd(adId int64) (*domain.Ad, *utils.ApplicationError) {
-
-	ad, err := domain.AdDao.GetAd(adId)
-	if err != nil {
+	result := &domain.Ad{Id: adId}
+	if err := result.GetAd(); err != nil {
 		return nil, err
 	}
-
-	return ad, nil
+	return result, nil
 }
