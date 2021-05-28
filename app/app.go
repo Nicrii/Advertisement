@@ -1,13 +1,21 @@
 package app
 
 import (
-	"github.com/Nicrii/Advertisement/controllers"
-	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
+var (
+	router *gin.Engine
+)
+
+func init() {
+	router = gin.Default()
+}
+
 func StartApp() {
-	http.HandleFunc("/GetAd", controllers.GetAd)
-	err := http.ListenAndServe(":8080", nil)
+	mapUrls()
+
+	err := router.Run(":8080")
 	if err != nil {
 		panic(err)
 	}
