@@ -30,11 +30,7 @@ func Get(id int64, fields []string) (*GetResponse, *utils.ApplicationError) {
 	}
 	result.Name = ad.Name
 	result.Price = ad.Price
-	if len(ad.ImagesURLs[0]) > 0 {
-		result.MainImage = ad.ImagesURLs[0]
-	} else {
-		result.MainImage = ""
-	}
+
 	for _, field := range fields {
 		switch field {
 		case "description":
