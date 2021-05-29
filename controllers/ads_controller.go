@@ -47,3 +47,17 @@ func Create(c *gin.Context) {
 		"status_code": statusCode,
 	})
 }
+
+func GetList(c *gin.Context) {
+	page := c.DefaultQuery("page", "1")
+	sortBy := c.DefaultQuery("sortby", "price")
+	sortDirection := c.DefaultQuery("sortdir", "asc")
+
+	ads, apiErr := services.AdsService.GetList(page, sortBy, sortDirection)
+	if apiErr != nil {
+		c.JSON(apiErr.StatusCode, apiErr)
+		return
+	}
+
+	c.JSON(http.StatusOK, ads)
+}

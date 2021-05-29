@@ -9,8 +9,10 @@ import (
 )
 
 const (
-	queryGetAd    = "SELECT id,name,description,images_urls,price, date FROM advertisement WHERE id=$1;"
-	queryInsertAd = "INSERT INTO advertisement(name, description,images_urls, price,date) VALUES($1, $2, $3,$4,now()) RETURNING id;"
+	queryGetAd         = "SELECT id,name,description,images_urls,price, date FROM advertisement WHERE id=$1;"
+	queryInsertAd      = "INSERT INTO advertisement(name, description,images_urls, price,date) VALUES($1, $2, $3,$4,now()) RETURNING id;"
+	queryGetListSelect = "SELECT name,images_urls[1],price FROM advertisement ORDER BY"
+	queryGetListLimit  = "LIMIT 10 OFFSET ($1-1)*10"
 )
 
 func Get(id int64, fields []string) (*GetResponse, *utils.ApplicationError) {
@@ -41,7 +43,6 @@ func Get(id int64, fields []string) (*GetResponse, *utils.ApplicationError) {
 			result.ImagesURLs = ad.ImagesURLs
 		}
 	}
-
 	return &result, nil
 }
 
@@ -61,4 +62,26 @@ func (ad *Ad) Save() (int64, int) {
 	}
 
 	return id, http.StatusOK
+}
+
+func GetList(page, sortBy, sortDirection string) (*[]GetResponse, *utils.ApplicationError) {
+	adsList := make([]GetResponse, 0, 10)
+	stmt, err := ads_db.Client.Prepare(queryGetListSelect + " " + sortBy + " " + sortDirection + " " + queryGetListLimit)
+	if err != nil {
+		return nil, &utils.ApplicationError{Message: err.Error(), StatusCode: http.StatusInternalServerError, Code: "server_error"}
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(page)
+	if err != nil {
+		return nil, &utils.ApplicationError{Message: err.Error(), StatusCode: http.StatusInternalServerError, Code: "server_error"}
+	}
+	defer rows.Close()
+	for i := 0; rows.Next(); i++ {
+		adsList = append(adsList, GetResponse{})
+		if err := rows.Scan(&adsList[i].Name, &adsList[i].MainImage, &adsList[i].Price); err != nil {
+			return nil, &utils.ApplicationError{Message: fmt.Sprintf("error when trying to get ad %s", err.Error()), StatusCode: http.StatusNotFound, Code: "not_found"}
+		}
+	}
+	return &adsList, nil
 }

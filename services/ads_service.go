@@ -28,3 +28,11 @@ func (a *adsService) Create(ad domain.Ad) (int64, int) {
 
 	return ad.Save()
 }
+
+func (a *adsService) GetList(page, sortBy, sortDirection string) (*[]domain.GetResponse, *utils.ApplicationError) {
+	result, err := domain.GetList(page, sortBy, sortDirection)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
