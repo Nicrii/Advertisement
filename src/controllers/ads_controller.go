@@ -28,7 +28,6 @@ func Get(c *gin.Context) {
 
 	c.JSON(http.StatusOK, ad)
 }
-
 func Create(c *gin.Context) {
 	var ad domain.Ad
 	if err := c.ShouldBindJSON(&ad); err != nil {

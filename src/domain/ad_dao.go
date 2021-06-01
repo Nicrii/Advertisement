@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	queryGetAd         = "SELECT id,name,description,images_urls,price, date FROM advertisement WHERE id=$1;"
-	queryInsertAd      = "INSERT INTO advertisement(name, description,images_urls, price,date) VALUES($1, $2, $3,$4,now()) RETURNING id;"
+	queryGetAd         = "SELECT id,name,description,images_urls,price,date FROM advertisement WHERE id=$1;"
+	queryInsertAd      = "INSERT INTO advertisement(name,description,images_urls,price,date) VALUES($1, $2, $3,$4,now()) RETURNING id;"
 	queryGetListSelect = "SELECT name,images_urls[1],price FROM advertisement ORDER BY"
 	queryGetListLimit  = "LIMIT 10 OFFSET ($1-1)*10"
 )
@@ -35,8 +35,10 @@ func Get(id int64, fields []string) (*GetResponse, *utils.ApplicationError) {
 		switch field {
 		case "description":
 			result.Description = ad.Description
+			break
 		case "images_urls":
 			result.ImagesURLs = ad.ImagesURLs
+			break
 		}
 	}
 	return &result, nil
