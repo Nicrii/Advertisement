@@ -30,19 +30,4 @@ func (config *Configuration) ReadConfiguration() {
 	if len(dbPort) > 0 {
 		config.Port = dbPort
 	}
-
-	//file, err := os.Open("./config.json")
-	//
-	//if err != nil {
-	//	return err
-	//}
-	//defer file.Close()
-	//decoder := json.NewDecoder(file)
-	//err = decoder.Decode(&config)
-	//
-	//if err != nil {
-	//	panic(err)
-	//	return err
-	//}
-	//return err
 }

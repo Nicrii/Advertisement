@@ -15,9 +15,10 @@ func init() {
 	var err error
 	config := configuration.Configuration{}
 	config.ReadConfiguration()
-	dbConnectionString := fmt.Sprintf("host=%s port=%s user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		config.Host, config.Port, config.User, config.Password, config.Dbname)
+	dbConnectionString := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		config.Host, config.Port, config.User, config.Password, config.Dbname,
+	)
 
 	Client, err = sql.Open("postgres", dbConnectionString)
 	if err != nil {
