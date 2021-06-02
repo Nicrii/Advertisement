@@ -11,7 +11,7 @@ import (
 const (
 	queryGetAd         = "SELECT id,name,description,images_urls,price,date FROM advertisement WHERE id=$1;"
 	queryInsertAd      = "INSERT INTO advertisement(name,description,images_urls,price,date) VALUES($1, $2, $3,$4,now()) RETURNING id;"
-	queryGetListSelect = "SELECT name,images_urls[1],price FROM advertisement ORDER BY"
+	queryGetListSelect = "SELECT name,CASE WHEN array_length(images_urls,1)>0 THEN images_urls[1] ELSE '' END,price FROM advertisement ORDER BY"
 	queryGetListLimit  = "LIMIT 10 OFFSET ($1-1)*10"
 )
 
@@ -21,13 +21,13 @@ func GetAd(id int64, fields []string) (*GetResponse, *utils.ApplicationError) {
 
 	stmt, err := ads_db.Client.Prepare(queryGetAd)
 	if err != nil {
-		return nil, &utils.ApplicationError{Message: fmt.Sprintf("error when trying to get ad %d", id), Code: http.StatusInternalServerError}
+		return nil, &utils.ApplicationError{Message: fmt.Sprintf("error when trying to get ads"), Code: http.StatusInternalServerError}
 	}
 	defer stmt.Close()
 
 	row := stmt.QueryRow(id)
 	if err := row.Scan(&ad.Id, &ad.Name, &ad.Description, pq.Array(&ad.ImagesURLs), &ad.Price, &ad.Date); err != nil {
-		return nil, &utils.ApplicationError{Message: fmt.Sprintf("error when trying to get ad %d", id), Code: http.StatusNotFound}
+		return nil, &utils.ApplicationError{Message: fmt.Sprintf("error when trying to get ads"), Code: http.StatusInternalServerError}
 	}
 	result.Name = ad.Name
 	result.Price = ad.Price
@@ -84,6 +84,7 @@ func GetListOfAds(page int, sortBy, sortDirection string) (*[]GetResponse, *util
 	for i := 0; rows.Next(); i++ {
 		adsList = append(adsList, GetResponse{})
 		if err := rows.Scan(&adsList[i].Name, &adsList[i].MainImage, &adsList[i].Price); err != nil {
+			fmt.Println(adsList[i].Name)
 			return nil, &utils.ApplicationError{Message: fmt.Sprintf("error when trying to get ad %s", err.Error()), Code: http.StatusNotFound}
 		}
 	}

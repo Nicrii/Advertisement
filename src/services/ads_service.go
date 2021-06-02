@@ -58,7 +58,7 @@ func (a *adsService) GetList(page, sortBy, sortDirection string) (*[]domain.GetR
 
 	isCorrect = false
 	for _, field := range []string{"asc", "desc"} {
-		if sortBy == field {
+		if sortDirection == field {
 			isCorrect = true
 			break
 		}
