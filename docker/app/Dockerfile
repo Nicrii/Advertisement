@@ -7,12 +7,12 @@ RUN apk update && apk add --no-cache git
 RUN mkdir /app
 WORKDIR /app
 
-COPY ./../../src/go.mod ./
-COPY ./../../src/go.sum ./
+COPY src/go.mod ./
+COPY src/go.sum ./
 
 RUN go mod download
 
-COPY ./../../src/ .
+COPY src/ .
 
 RUN go build -o ./main
 

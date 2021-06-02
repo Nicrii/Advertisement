@@ -1,9 +1,11 @@
-version: '3'
+version: "3.6"
 
 services:
   app:
     container_name: advertisement_api
-    build: docker/app
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
     ports:
       - 8080:8080
     restart: on-failure
